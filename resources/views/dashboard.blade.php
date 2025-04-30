@@ -13,7 +13,7 @@
             </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white m-4 dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     {{ __('Welcome,') }} {{ Auth::user()->first_name }}!
                 </div>
@@ -22,30 +22,9 @@
                 </div>
             </div>
 
-            <div class="mt-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach ($accounts as $account)
-                    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4">
-                        <p class="text-gray-800 dark:text-gray-200 flex justify-between">
-                            <span>{{ __('Account Type:') }} {{ $account->type }}</span>
-                            <span>{{ __('Account Number:') }} {{ $account->number }}</span>
-                        </p>
-                        <h3 class="text-lg font-semibold text-gray-600 dark:text-gray-400 mt-4">
-                            {{ __('Your Balance:') }}
-                            @if ($selectedCurrency !== 'USD')
-                            {{ $currencySymbol }}{{ $convertedPerAccount[$account->id][$selectedCurrency] ?? $account->balance }}
-                            @else
-                            {{ $currencySymbol }}{{ $account->balance }}
-                            @endif
-                        </h3>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
             <!-- Make a Transfer Button -->
-            <div class="mt-8">
-                <button onclick="toggleTransferForm()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <div class="py-4">
+                <button onclick="toggleTransferForm()" class="bg-blue-600 border hover:bg-blue-800 text-white font-bold py-2 px-4 rounded">
                     {{ __('Make a Transfer') }}
                 </button>
 
@@ -108,6 +87,29 @@
                     </div>
                 </div>
             </div>
+
+            <div class="">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach ($accounts as $account)
+                    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 mb-4">
+                        <p class="text-gray-800 dark:text-gray-200 flex justify-between">
+                            <span>{{ __('Account Type:') }} {{ $account->type }}</span>
+                            <span>{{ __('Account Number:') }} {{ $account->number }}</span>
+                        </p>
+                        <h3 class="text-lg font-semibold text-gray-600 dark:text-gray-400 mt-4">
+                            {{ __('Your Balance:') }}
+                            @if ($selectedCurrency !== 'USD')
+                            {{ $currencySymbol }}{{ $convertedPerAccount[$account->id][$selectedCurrency] ?? $account->balance }}
+                            @else
+                            {{ $currencySymbol }}{{ $account->balance }}
+                            @endif
+                        </h3>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+
 
         </div>
     </div>

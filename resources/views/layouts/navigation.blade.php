@@ -15,27 +15,42 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    @if (Auth::user()?->is_admin)
                     <x-nav-link :href="route('admin.accounts')" :active="request()->routeIs('admin.accounts')">
-                        {{ __('Admin / Accounts') }}
+                        {{ __('View All Accounts') }}
                     </x-nav-link>
+                    @endif
                 </div>
             </div>
-            
+
             <!-- Currency Selector -->
-            <form method="POST" action="{{ route('currency.set') }}" class="inline-block ms-4">
-                @csrf
-                <select name="currency" onchange="this.form.submit()" class="bg-white dark:bg-gray-800 border text-sm rounded px-2 py-1">
-                    @php
-                    $currencies = ['USD', 'EUR', 'GBP'];
-                    $selected = session('currency', 'USD');
-                    @endphp
-                    @foreach($currencies as $currency)
-                    <option value="{{ $currency }}" {{ $selected === $currency ? 'selected' : '' }}>
-                        {{ $currency }}
-                    </option>
-                    @endforeach
-                </select>
-            </form>
+            <div class="flex items-center">
+                <x-dropdown align="right" width="36">
+                    <x-slot name="trigger">
+                        <button
+                            class="flex items-center px-2 py-1 bg-white dark:bg-gray-800 text-white text-sm rounded border dark:border-gray-600">
+                            {{ session('currency', 'USD') }}
+                            <svg class="ml-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    </x-slot>
+
+                    <x-slot name="content">
+                        <form method="POST" action="{{ route('currency.set') }}">
+                            @csrf
+                            @foreach(['USD', 'EUR', 'GBP'] as $currency)
+                            <button type="submit" name="currency" value="{{ $currency }}"
+                                class="w-full px-4 py-1 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+                                {{ $currency }}
+                            </button>
+                            @endforeach
+                        </form>
+                    </x-slot>
+                </x-dropdown>
+            </div>
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -56,9 +71,11 @@
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
+                        @if (Auth::user()?->is_admin)
                         <x-dropdown-link :href="route('admin.accounts')" class="text-sm">
-                            {{ __('Admin / Accounts') }}
+                            {{ __('View All Accounts') }}
                         </x-dropdown-link>
+                        @endif
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -91,9 +108,11 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            @if (Auth::user()?->is_admin)
             <x-responsive-nav-link :href="route('admin.accounts')" :active="request()->routeIs('admin.accounts')">
-                {{ __('Admin / Accounts') }}
+                {{ __('View All Accounts') }}
             </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
@@ -108,9 +127,11 @@
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
+                @if (Auth::user()?->is_admin)
                 <x-responsive-nav-link :href="route('admin.accounts')" class="text-sm">
-                    {{ __('Admin / Accounts') }}
+                    {{ __('View All Accounts') }}
                 </x-responsive-nav-link>
+                @endif
 
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">

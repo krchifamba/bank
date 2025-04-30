@@ -10,10 +10,10 @@
 
             <div x-data="{ open: false }">
                 <!-- Create Account Button -->
-                <div class="flex justify-end mb-4">
+                <div class="flex mb-4">
                     <button
                         @click="open = true"
-                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded border">
                         + Create New Account
                     </button>
                 </div>
@@ -104,29 +104,45 @@
                 </div>
             </div>
 
+            <!-- Search -->
+            <form method="GET" action="{{ route('admin.accounts') }}" class="mb-4">
+                <div class="flex items-center gap-2">
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Search by name, email, or account #..."
+                        class="w-full max-w-md p-2 rounded border dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-200" />
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Search
+                    </button>
+                </div>
+            </form>
+
+
             <!-- Accounts Table -->
             @if ($accounts->count())
-            <div class="overflow-x-auto bg-white dark:bg-gray-800 shadow rounded-lg mt-6">
-                <table class="min-w-full table-auto text-sm text-left text-gray-800 dark:text-gray-200">
-                    <thead class="min-w-full bg-gray-100 dark:bg-gray-700">
+            <div class="overflow-x-auto w-full bg-white dark:bg-gray-800 shadow rounded-lg">
+                <table class="w-full table-auto text-sm text-left text-gray-800 dark:text-gray-200">
+                    <thead class="bg-gray-100 dark:bg-gray-700">
                         <tr>
-                            <th class="px-4 py-3 w-1/6 whitespace-nowrap">Name</th>
-                            <th class="px-4 py-3 w-1/6 whitespace-nowrap">Email</th>
-                            <th class="px-4 py-3 w-1/6 whitespace-nowrap">Account #</th>
-                            <th class="px-4 py-3 w-1/6 whitespace-nowrap">Type</th>
-                            <th class="px-4 py-3 w-1/6 whitespace-nowrap">Balance</th>
-                            <th class="px-4 py-3 w-1/4 whitespace-nowrap">Address</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Name</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Email</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Account #</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Type</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Balance</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Address</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach ($accounts as $account)
                         <tr>
-                            <td class="px-4 py-3 break-words truncate max-w-xs">{{ $account->name }}</td>
-                            <td class="px-4 py-3 break-words truncate max-w-xs">{{ $account->email }}</td>
-                            <td class="px-4 py-3 break-words truncate">{{ $account->number }}</td>
+                            <td class="px-4 py-3 truncate max-w-xs">{{ $account->name }}</td>
+                            <td class="px-4 py-3 truncate max-w-xs">{{ $account->email }}</td>
+                            <td class="px-4 py-3">{{ $account->number }}</td>
                             <td class="px-4 py-3 capitalize">{{ $account->type }}</td>
                             <td class="px-4 py-3">${{ number_format($account->balance, 2) }}</td>
-                            <td class="px-4 py-3 break-words truncate max-w-sm">{{ $account->address }}</td>
+                            <td class="px-4 py-3 truncate max-w-sm">{{ $account->address }}</td>
                         </tr>
                         @endforeach
                     </tbody>

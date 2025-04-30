@@ -185,7 +185,6 @@ class CurrencyController extends Controller
                 return response()->json(['error' => 'Failed to fetch conversion rate'], 500);
             }
         }
-        dd($currency, $amount);
 
         // Perform transfer in USD
         $fromAccount->balance -= $amount;

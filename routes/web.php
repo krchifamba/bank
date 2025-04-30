@@ -27,7 +27,7 @@ Route::get('/transactions', [TransactionController::class, 'index'])
     ->name('transactions.index');
 
 Route::get('/admin/accounts', [AccountController::class, 'index'])
-    ->middleware('auth') // Ensure the user is logged in
+    ->middleware('auth') 
     ->name('admin.accounts');
 
 Route::post('/admin/accounts/create', [AccountController::class, 'store'])

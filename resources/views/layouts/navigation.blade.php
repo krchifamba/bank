@@ -15,15 +15,34 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('admin.accounts')" :active="request()->routeIs('admin.accounts')">
+                        {{ __('Admin / Accounts') }}
+                    </x-nav-link>
                 </div>
             </div>
+            
+            <!-- Currency Selector -->
+            <form method="POST" action="{{ route('currency.set') }}" class="inline-block ms-4">
+                @csrf
+                <select name="currency" onchange="this.form.submit()" class="bg-white dark:bg-gray-800 border text-sm rounded px-2 py-1">
+                    @php
+                    $currencies = ['USD', 'EUR', 'GBP'];
+                    $selected = session('currency', 'USD');
+                    @endphp
+                    @foreach($currencies as $currency)
+                    <option value="{{ $currency }}" {{ $selected === $currency ? 'selected' : '' }}>
+                        {{ $currency }}
+                    </option>
+                    @endforeach
+                </select>
+            </form>
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-hidden transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
+                            <div>{{ Auth::user()->first_name }}</div>
 
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -37,14 +56,16 @@
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
-
+                        <x-dropdown-link :href="route('admin.accounts')" class="text-sm">
+                            {{ __('Admin / Accounts') }}
+                        </x-dropdown-link>
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
 
                             <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
+                                onclick="event.preventDefault();
+                                            this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
                         </form>
@@ -70,6 +91,9 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.accounts')" :active="request()->routeIs('admin.accounts')">
+                {{ __('Admin / Accounts') }}
+            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->
@@ -84,12 +108,16 @@
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
+                <x-responsive-nav-link :href="route('admin.accounts')" class="text-sm">
+                    {{ __('Admin / Accounts') }}
+                </x-responsive-nav-link>
+
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
+                        onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>

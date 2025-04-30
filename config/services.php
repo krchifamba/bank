@@ -34,5 +34,10 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    
+    'exchangerates' => [
+        'api_key' => env('EXCHANGE_API_KEY'),
+        'api_url' => env('EXCHANGE_API_URL'),
+    ],
 
 ];

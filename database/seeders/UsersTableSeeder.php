@@ -20,7 +20,7 @@ class UsersTableSeeder extends Seeder
                 'last_name' => 'Ikari',
                 'address' => 'Tokyo-3, Japan',
                 'date_of_birth' => '1967-04-29',
-                'email' => 'ikarigendo@testmail.com',
+                'email' => config('app.fake_admin_email'),
                 'password' => Hash::make('password'),
                 'is_admin' => true,
             ],

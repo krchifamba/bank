@@ -8,9 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Exception;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-
+use App\Http\Controllers\CurrencyController;
 
 class TransferController extends Controller
 {
@@ -19,12 +18,19 @@ class TransferController extends Controller
         $user = Auth::user();
         $accounts = $user->accounts;
 
-        return view('transfer.create', compact('accounts'));
-    }
+        // Currency symbols array
+        $currencySymbols = [
+            'USD' => '$',
+            'EUR' => '€',
+            'GBP' => '£',
+        ];
 
+        return view('transfer.create', compact('accounts', 'currencySymbols'));
+    }
 
     public function store(Request $request)
     {
+        // Validate incoming request
         try {
             $validated = $request->validate([
                 'from_account_id' => 'required|exists:accounts,id',
@@ -32,53 +38,66 @@ class TransferController extends Controller
                 'amount' => 'required|numeric|min:0.01',
                 'description' => 'nullable|string|max:255',
             ]);
-                    
         } catch (ValidationException $e) {
             dd('Validation failed!', $e->errors());
         }
-        
-        
-    
+
         $fromAccount = Account::findOrFail($validated['from_account_id']);
         $toAccount = Account::where('number', $validated['to_account_number'])->firstOrFail();
-    
+
         if ($fromAccount->user_id !== Auth::id()) {
             abort(403, 'Unauthorized transfer.');
         }
-    
+
+        // Prevent transfer to the same account
+        if ($fromAccount->id === $toAccount->id) {
+            return back()->withErrors(['to_account_number' => 'Cannot transfer to the same account.']);
+        }
+
         if ($fromAccount->balance < $validated['amount']) {
             return back()->withErrors(['amount' => 'Insufficient balance.']);
         }
-    
+
+        // Currency conversion using CurrencyController
+        $currencyController = new CurrencyController();
+        $amountToDeduct = $validated['amount'];
+        $amountToCredit = $validated['amount'];
+
+        if ($fromAccount->currency !== $toAccount->currency) {
+            $conversionRate = $currencyController->getExchangeRate($fromAccount->currency, $toAccount->currency);
+            $amountToCredit = round($amountToDeduct * $conversionRate, 2);
+        }
+
         try {
-            DB::transaction(function () use ($fromAccount, $toAccount, $validated) {
-                $amount = $validated['amount'];
-    
-                // Subtract from sender
-                $fromAccount->balance -= $amount;
+            DB::transaction(function () use ($fromAccount, $toAccount, $amountToDeduct, $amountToCredit, $validated) {
+                $fromAccount->balance -= $amountToDeduct;
                 $fromAccount->save();
-    
-                // Add to receiver
-                $toAccount->balance += $amount;
+
+                $toAccount->balance += $amountToCredit;
                 $toAccount->save();
-    
+
                 $now = now();
-    
-                // Log transaction
+
                 Transaction::create([
                     'account_id' => $fromAccount->id,
                     'type' => 'transfer',
-                    'amount' => $amount,
-                    'description' => "Transferred £{$amount} to account #{$toAccount->account_number}",
+                    'amount' => $amountToDeduct,
+                    'description' => "Transferred {$fromAccount->currency} {$amountToDeduct} to account #{$toAccount->number}",
+                    'transaction_date' => $now,
+                ]);
+
+                Transaction::create([
+                    'account_id' => $toAccount->id,
+                    'type' => 'transfer',
+                    'amount' => $amountToCredit,
+                    'description' => "Received {$toAccount->currency} {$amountToCredit} from account #{$fromAccount->number}",
                     'transaction_date' => $now,
                 ]);
             });
         } catch (Exception $e) {
             dd('Transaction failed:', $e->getMessage());
         }
-    
+
         return redirect()->route('dashboard')->with('success', 'Transfer completed successfully.');
     }
-    
-    
 }

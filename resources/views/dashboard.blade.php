@@ -15,7 +15,7 @@
 
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    {{ __('Welcome, ') }} {{ Auth::user()->first_name }}!
+                    {{ __('Welcome,') }} {{ Auth::user()->first_name }}!
                 </div>
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     {{ __('You have ') }} {{ $accounts->count() }} {{ __('account(s).') }}
@@ -31,7 +31,12 @@
                             <span>{{ __('Account Number:') }} {{ $account->number }}</span>
                         </p>
                         <h3 class="text-lg font-semibold text-gray-600 dark:text-gray-400 mt-4">
-                            {{ __('Your Balance: £') }}{{ number_format($account->balance, 2) }}
+                            {{ __('Your Balance:') }}
+                            @if ($selectedCurrency !== 'USD')
+                            {{ $currencySymbol }}{{ $convertedPerAccount[$account->id][$selectedCurrency] ?? $account->balance }}
+                            @else
+                            {{ $currencySymbol }}{{ $account->balance }}
+                            @endif
                         </h3>
                     </div>
                     @endforeach
@@ -58,7 +63,12 @@
                                 <select name="from_account_id" id="from_account_id" class="w-full p-2 rounded" required>
                                     @foreach ($accounts as $account)
                                     <option value="{{ $account->id }}">
-                                        {{ $account->number }} (Balance: £{{ number_format($account->balance, 2) }})
+                                        {{ __('Your Balance:') }}
+                                        @if ($selectedCurrency !== 'USD')
+                                        {{ $currencySymbol }}{{ $convertedPerAccount[$account->id][$selectedCurrency] ?? $account->balance }}
+                                        @else
+                                        {{ $currencySymbol }}{{ $account->balance }}
+                                        @endif
                                     </option>
                                     @endforeach
                                 </select>
@@ -72,10 +82,10 @@
                                 <input type="text" name="to_account_number" id="to_account_number" placeholder="Enter receiver's Account Number" class="w-full p-2 rounded" required>
                             </div>
 
-                            <!-- Amount -->
+                            <!-- Amount (In session currency) -->
                             <div class="mb-4">
                                 <label for="amount" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
-                                    Amount
+                                    Amount ({{ $selectedCurrency }})
                                 </label>
                                 <input type="number" name="amount" id="amount" step="0.01" min="0.01" class="w-full p-2 rounded" required>
                             </div>
@@ -97,7 +107,6 @@
                         </form>
                     </div>
                 </div>
-
             </div>
 
         </div>

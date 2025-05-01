@@ -190,7 +190,6 @@ class CurrencyController extends Controller
         $fromAccount->balance -= $amount;
         $toAccount->balance += $amount;
 
-        dd($fromAccount->balance, $toAccount->balance);
         // Save the changes
         $fromAccount->save();
         $toAccount->save();

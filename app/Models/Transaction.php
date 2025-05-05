@@ -15,6 +15,9 @@ class Transaction extends Model
         'account_id',
         'type',         // deposit, withdrawal, transfer
         'amount',
+        'spread_amount',
+        'from_account_number',
+        'to_account_number',
         'description',
         'transaction_date',
     ];

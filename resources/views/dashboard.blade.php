@@ -64,9 +64,18 @@
                             <!-- Amount (In session currency) -->
                             <div class="mb-4">
                                 <label for="amount" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
-                                    Amount ({{ $selectedCurrency }})
+                                    Amount
                                 </label>
                                 <input type="number" name="amount" id="amount" step="0.01" min="0.01" class="w-full p-2 rounded" required>
+                            </div>
+
+                            
+                            <div class="flex items-center">
+                                <select name="currency" id="currency" class="w-full p-2 rounded">
+                                    <option value="USD" selected>USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="GBP">GBP</option>
+                                </select>
                             </div>
 
                             <!-- Description -->
@@ -76,6 +85,7 @@
                                 </label>
                                 <input type="text" name="description" id="description" class="w-full p-2 rounded">
                             </div>
+
 
                             <!-- Submit Button -->
                             <div class="flex justify-end">

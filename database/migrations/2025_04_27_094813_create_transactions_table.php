@@ -16,6 +16,9 @@ return new class extends Migration
             $table->foreignId('account_id')->constrained()->onDelete('cascade');
             $table->enum('type', ['deposit', 'withdrawal', 'transfer']);
             $table->decimal('amount', 15, 2);
+            $table->decimal('spread_amount', 15, 2);
+            $table->text('from_account_number');
+            $table->text('to_account_number');
             $table->text('description')->nullable();
             $table->timestamp('transaction_date')->nullable(); 
             $table->timestamps();

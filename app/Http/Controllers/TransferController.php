@@ -36,6 +36,7 @@ class TransferController extends Controller
                 'from_account_id' => 'required|exists:accounts,id',
                 'to_account_number' => 'required|exists:accounts,number',
                 'amount' => 'required|numeric|min:0.01',
+                'currency' => 'required|in:USD,EUR,GBP',
                 'description' => 'nullable|string|max:255',
             ]);
         } catch (ValidationException $e) {
@@ -60,6 +61,7 @@ class TransferController extends Controller
 
         // Currency conversion using CurrencyController
         $currencyController = new CurrencyController();
+        
         $amountToDeduct = $validated['amount'];
         $amountToCredit = $validated['amount'];
 
@@ -78,21 +80,25 @@ class TransferController extends Controller
 
                 $now = now();
 
+                $spread = 0.01;
+                $spreadAmount = 0.00;
+
+                if ($validated['currency'] !== 'USD') {
+                    $spreadAmount = $amountToDeduct * $spread;
+                    $amountToDeduct -= $spreadAmount; 
+                }
+
                 Transaction::create([
                     'account_id' => $fromAccount->id,
                     'type' => 'transfer',
                     'amount' => $amountToDeduct,
-                    'description' => "Transferred {$fromAccount->currency} {$amountToDeduct} to account #{$toAccount->number}",
+                    'spread_amount' => $spreadAmount,
+                    'from_account_number' => $fromAccount->number,
+                    'to_account_number' => $toAccount->number,
+                    'description' => $validated['description'],
                     'transaction_date' => $now,
                 ]);
 
-                Transaction::create([
-                    'account_id' => $toAccount->id,
-                    'type' => 'transfer',
-                    'amount' => $amountToCredit,
-                    'description' => "Received {$toAccount->currency} {$amountToCredit} from account #{$fromAccount->number}",
-                    'transaction_date' => $now,
-                ]);
             });
         } catch (Exception $e) {
             dd('Transaction failed:', $e->getMessage());
